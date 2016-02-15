@@ -7,6 +7,24 @@ class UserTest < ActiveSupport::TestCase
     password: "foobar", password_confirmation: "foobar")
   end
   
+  test "feed should have the right posts" do 
+    michael = users(:michael)
+    archer = users(:archer)
+    lana = users(:lana)
+    # Posts from followed user
+    lana.microposts.each do |post_following|
+      assert michael.feed.include?(post_following)
+    end
+    # Posts from self
+    michael.microposts.each do |post_self|
+      assert michael.feed.include?(post_self)
+    end
+    # Posts from unfollowed user
+    archer.microposts.each do |post_unfollowed|
+      assert_not michael.feed.include?(post_unfollowed)
+    end
+  end
+  
   test "should be valid" do
     assert @user.valid?
   end
@@ -52,6 +70,17 @@ class UserTest < ActiveSupport::TestCase
     duplicate_user.email = @user.email.upcase
     @user.save
     assert_not duplicate_user.valid?
+  end
+  
+    test "should follow and unfollow a user" do
+    michael = users(:michael)
+    archer  = users(:archer)
+    assert_not michael.following?(archer)
+    michael.follow(archer)
+    assert michael.following?(archer)
+    assert archer.followers.include?(michael)
+    michael.unfollow(archer)
+    assert_not michael.following?(archer)
   end
   
   test "password should be present (nonblank)" do
