@@ -69,11 +69,11 @@ class User < ActiveRecord::Base
     reset_sent_at < 2.hours.ago
   end
   
-  # Returns true if the given token matches the digest.
-  # def authenticated?(remember_token)
-   # return false if remember_digest.nil?
-    #BCrypt::Password.new(remember_digest).is_password?(remember_token)
-  # end
+# Defines a proto feed
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
+  
   private
   
   # Converts email to all lower-case
